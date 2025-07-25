@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Tiny5&display=swap" rel="stylesheet" />
+    <title>Daggerfall Roleplay Generator</title>
+    <link rel="icon" type="image/x-icon" href="/resources/DAGGER.ICO" />
+</head>
+
+<body>
+    <div id="settings" class="folded">
+        <span>Daggerfall Roleplay Generator</span>
+        <label class="tooltip">
+            <span id="randomness-description" class="tooltiptext tooltiptext-left">
+                Make a character trully randomlly with no regard about its viability in game.
+            </span>
+            Type :
+            <select name="randomness" id="randomness" onchange="updateRandomnessTooltip(this.value)">
+                <option value="random">Random</option>
+                <option value="coherent" disabled>Coherent</option>
+                <option value="question" disabled>Questions</option>
+                <option value="custom" disabled>Custom</option>
+            </select>
+        </label>
+        <label id="missions-number-container">
+            Missions :
+            <input type="range" name="missions-number" id="missions-number" value="5" min="1" max="10" />
+        </label>
+        <button id="generate" class="stone-border-tiny" onclick="randomize()">
+            Roll
+        </button>
+        <!-- <button id="characterHash" onclick="">Export</button> -->
+        <a class="stone-border-tiny" href="https://store.steampowered.com/app/1812390/The_Elder_Scrolls_II_Daggerfall/">
+            Daggerfall
+        </a>
+        <a class="stone-border-tiny" href="https://github.com/Interkarma/daggerfall-unity/releases">
+            DF Unity
+        </a>
+        <span class="tooltip stone-border-tiny">
+            License
+            <span class="tooltiptext tooltiptext-right">
+                <p>
+                    Some images/texts were taken from the Elder Scrolls series of video games or from websites created
+                    and owned by Bethesda Softworks, the copyright of which is held by Bethesda Softworks.
+                </p>
+                <p>
+                    All trademarks and registered trademarks present in the image are proprietary to Bethesda Softworks,
+                    the inclusion of which implies no affiliation with Lavande Potions.
+                </p>
+                <p>
+                    The use of images to illustrate articles concerning the subject of the images in question is
+                    believed to fall under the
+                    <a href="https://en.wikipedia.org/wiki/Fair_use">
+                        fair use
+                    </a>
+                    of the law.
+                </p>
+            </span>
+        </span>
+        <span class="tooltip stone-border-tiny">
+            Credits
+            <span class="tooltiptext tooltiptext-right">
+                Developped by
+                <a class="stone-border-tiny" href="https://lavande-potions.itch.io/">
+                    Lavande Potions
+                </a>
+            </span>
+        </span>
+        <a id="coffee" href='https://ko-fi.com/H2H71IERIX' target='_blank'>
+            <img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi3.png?v=6'
+                border='0' alt='Buy Me a Coffee at ko-fi.com' />
+        </a>
+        <button id="responsive-btn" class="folded stone-border-tiny" onclick="unfoldSettings()">🡙</button>
+    </div>
+    <div class="scroll-parent">
+        <div class="main-col-container">
+            <section class="main-col">
+                <h1>Character</h1>
+                <div id="character-container" class="stone-border-tiny">
+                    <div id="character-face-container">
+                        <img src="resources/faces/breton/female/0-0.PNG" alt="character's face" id="character-face"
+                            height="64" />
+                    </div>
+                    <div id="character-info">
+                        <label>
+                            Name :
+                            <input type="text" name="character-name" id="character-name" value="" disabled />
+                        </label>
+                        <label class="tooltip">
+                            <span id="character-race-description" class="tooltiptext tooltiptext-left"></span>
+                            Race :
+                            <select name="character-race" id="character-race" disabled>
+                                <option value="">random</option>
+                                <option value="argonian">Argonian</option>
+                                <option value="breton">Breton</option>
+                                <option value="elfDark">Dark Elf</option>
+                                <option value="elfHigh">High Elf</option>
+                                <option value="khajiit">Khajiit</option>
+                                <option value="nord">Nord</option>
+                                <option value="redguard">Redguard</option>
+                                <option value="elfWood">Wood Elf</option>
+                            </select>
+                        </label>
+                        <label>
+                            Gender :
+                            <select name="character-gender" id="character-gender" disabled>
+                                <option value="">random</option>
+                                <option value="female">Female</option>
+                                <option value="male">Male</option>
+                            </select>
+                        </label>
+                        <label class="tooltip">
+                            <span id="character-class-description" class="tooltiptext tooltiptext-left"></span>
+                            Class :
+                            <input type="text" name="character-class-name" id="character-class-name" disabled />
+                        </label>
+                    </div>
+                </div>
+                <h1>Missions</h1>
+                <div id="missions-container" class="stone-border-tiny"></div>
+            </section>
+            <section class="main-col">
+                <h1>Attributes</h1>
+                <div id="attributes-container">
+                    <div id="strength-couple" class="couple-container">
+                        <div id="strength-container" class="couple-tiny stone-border-tiny tooltip">
+                            <span id="strength-description" class="tooltiptext tooltiptext-left"></span>
+                            <h2 id="strength-text">STR</h2>
+                            <span id="strength-value">10</span>
+                        </div>
+                        <div id="strength-effects" class="couple stone-border-tiny">
+                            <div id="strength-effects-dmg-container" class="tooltip">
+                                <span id="strength-effects-dmg-description" class="tooltiptext tooltiptext-left">
+                                    Damage Modifier =<br />
+                                    (Strength - 50) / 5
+                                </span>
+                                <label for="strength-effects-dmg">DAM:</label>
+                                <input type="text" name="strength-effects-dmg" id="strength-effects-dmg" value="0"
+                                    disabled />
+                            </div>
+                            <div id="strength-effects-enc-container" class="tooltip">
+                                <span id="strength-effects-enc-description" class="tooltiptext tooltiptext-left">
+                                    Maximum Encumbrance =<br />
+                                    Strength x 1.5
+                                </span>
+                                <label for="strength-effects-enc">MAX ENC:</label>
+                                <input type="number" name="strength-effects-enc" id="strength-effects-enc" value="0"
+                                    disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div id="intelligence-couple" class="couple-container">
+                        <div id="intelligence-container" class="couple-tiny stone-border-tiny tooltip">
+                            <span id="intelligence-description" class="tooltiptext tooltiptext-left"></span>
+                            <h2 id="intelligence-text">INT</h2>
+                            <span id="intelligence-value">10</span>
+                        </div>
+                        <div id="intelligence-effects" class="couple stone-border-tiny">
+                            <div id="intelligence-effects-spl-container" class="tooltip">
+                                <span id="intelligence-effects-spl-description" class="tooltiptext tooltiptext-left">
+                                    Spell Points =<br />
+                                    Intelligence / 2
+                                </span>
+                                <label for="intelligence-effects-spl">SPELL PTS:</label>
+                                <input type="number" name="intelligence-effects-spl" id="intelligence-effects-spl"
+                                    value="0" disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div id="willpower-couple" class="couple-container">
+                        <div id="willpower-container" class="couple-tiny stone-border-tiny tooltip">
+                            <span id="willpower-description" class="tooltiptext tooltiptext-left"></span>
+                            <h2 id="willpower-text">WIL</h2>
+                            <span id="willpower-value">10</span>
+                        </div>
+                        <div id="willpower-effects" class="couple stone-border-tiny">
+                            <div id="willpower-effects-mres-container" class="tooltip">
+                                <span id="willpower-effects-mres-description" class="tooltiptext tooltiptext-left">
+                                    Magic Resistance =<br />
+                                    +1 bonus point per 10 points of Willpower
+                                </span>
+                                <label for="willpower-effects-mres">MAGIC RESIST:</label>
+                                <input type="number" name="willpower-effects-mres" id="willpower-effects-mres" value="0"
+                                    disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div id="agility-couple" class="couple-container">
+                        <div id="agility-container" class="couple-tiny stone-border-tiny tooltip">
+                            <span id="agility-description" class="tooltiptext tooltiptext-left">
+                                Agility governs ability to hit a target, to avoid getting hit, and the ease of
+                                increasing
+                                agility-related skills.
+                            </span>
+                            <h2 id="agility-text">AGI</h2>
+                            <span id="agility-value">10</span>
+                        </div>
+                        <div id="agility-effects" class="couple stone-border-tiny">
+                            <div id="agility-effects-hit-container" class="tooltip">
+                                <span id="agility-effects-hit-description" class="tooltiptext tooltiptext-left">
+                                    Hit Chance modifier =<br />
+                                    (attacker's Agility - target's Agility) / 10
+                                </span>
+                                <label for="agility-effects-hit">TO HIT:</label>
+                                <input type="text" name="agility-effects-hit" id="agility-effects-hit" value="0"
+                                    disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div id="endurance-couple" class="couple-container">
+                        <div id="endurance-container" class="couple-tiny stone-border-tiny tooltip">
+                            <span id="endurance-description" class="tooltiptext tooltiptext-left">
+                                Endurance governs hit points, healing rate, resistance to poisons and diseases, and
+                                fatigue.
+                            </span>
+                            <h2 id="endurance-text">END</h2>
+                            <span id="endurance-value">10</span>
+                        </div>
+                        <div id="endurance-effects" class="couple stone-border-tiny">
+                            <div id="endurance-effects-hp-container" class="tooltip">
+                                <span id="endurance-effects-hp-description" class="tooltiptext tooltiptext-left">
+                                    Maximum Hit Points gained per level =<br />
+                                    (Endurance - 50) / 10
+                                </span>
+                                <label for="endurance-effects-hp">HIT PTS:</label>
+                                <input type="text" name="endurance-effects-hp" id="endurance-effects-hp" value="0"
+                                    disabled />
+                            </div>
+                            <div id="endurance-effects-hrat-container" class="tooltip">
+                                <span id="endurance-effects-hrat-description" class="tooltiptext tooltiptext-left">
+                                    Healing per hour of rest =<br />
+                                    +1 bonus point per 10 points of Endurance
+                                </span>
+                                <label for="endurance-effects-hrat">HEALING RATE:</label>
+                                <input type="text" name="endurance-effects-hrat" id="endurance-effects-hrat" value="0"
+                                    disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div id="personality-container" class="couple-tiny stone-border-tiny tooltip">
+                        <span id="personality-description" class="tooltiptext tooltiptext-left">
+                            Personality governs the ease of increasing personality-related skills.
+                        </span>
+                        <h2 id="personality-text">PER</h2>
+                        <span id="personality-value">10</span>
+                    </div>
+                    <div id="speed-container" class="couple-tiny stone-border-tiny tooltip">
+                        <span id="speed-description" class="tooltiptext tooltiptext-left">
+                            Speed governs movement rate, missile reloading time, and all speed-related skills.
+                        </span>
+                        <h2 id="speed-text">SPD</h2>
+                        <span id="speed-value">10</span>
+                    </div>
+                    <div id="luck-container" class="couple-tiny stone-border-tiny tooltip">
+                        <span id="luck-description" class="tooltiptext tooltiptext-left">
+                            Luck is a powerful modifier to any action you take. There are no skills in which luck is the
+                            primary attribute, but your odds of succeeding in any skill trial is modified by your luck
+                        </span>
+                        <h2 id="luck-text">LUC</h2>
+                        <span id="luck-value">10</span>
+                    </div>
+                </div>
+            </section>
+            <section class="main-col">
+                <h1>Skills</h1>
+                <div id="skills-container">
+                    <div id="primary-skills-couple" class="couple-container-no-gap">
+                        <div id="primary-skills" class="couple stone-border">
+                            <h2>PRIMARY SKILLS</h2>
+                            <div class="stone-padding">
+                                <div id="primary-1" class="stone-border-tiny tooltip"></div>
+                                <div id="primary-2" class="stone-border-tiny tooltip"></div>
+                                <div id="primary-3" class="stone-border-tiny tooltip"></div>
+                            </div>
+                        </div>
+                        <div id="primary-skills-values" class="couple-tiny stone-border-tiny">
+                            <div id="primary-1-number-container" class="stone-padding-tiny">
+                                <input type="number" name="primary-1-number" id="primary-1-number" value="0" disabled />
+                            </div>
+                            <div id="primary-2-number-container" class="stone-padding-tiny">
+                                <input type="number" name="primary-2-number" id="primary-2-number" value="0" disabled />
+                            </div>
+                            <div id="primary-3-number-container" class="stone-padding-tiny">
+                                <input type="number" name="primary-3-number" id="primary-3-number" value="0" disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div id="major-skills-couple" class="couple-container-no-gap">
+                        <div id="major-skills" class="couple stone-border">
+                            <h2>MAJOR SKILLS</h2>
+                            <div class="stone-padding">
+                                <div id="major-1" class="stone-border-tiny tooltip"></div>
+                                <div id="major-2" class="stone-border-tiny tooltip"></div>
+                                <div id="major-3" class="stone-border-tiny tooltip"></div>
+                            </div>
+                        </div>
+                        <div id="major-skills-values" class="couple-tiny stone-border-tiny">
+                            <div id="major-1-number-container" class="stone-padding-tiny">
+                                <input type="number" name="major-1-number" id="major-1-number" value="0" disabled />
+                            </div>
+                            <div id="major-2-number-container" class="stone-padding-tiny">
+                                <input type="number" name="major-2-number" id="major-2-number" value="0" disabled />
+                            </div>
+                            <div id="major-3-number-container" class="stone-padding-tiny">
+                                <input type="number" name="major-3-number" id="major-3-number" value="0" disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div id="minor-skills-couple" class="couple-container-no-gap">
+                        <div id="minor-skills" class="couple stone-border">
+                            <h2>MINOR SKILLS</h2>
+                            <div class="stone-padding">
+                                <div id="minor-1" class="stone-border-tiny tooltip"></div>
+                                <div id="minor-2" class="stone-border-tiny tooltip"></div>
+                                <div id="minor-3" class="stone-border-tiny tooltip"></div>
+                                <div id="minor-4" class="stone-border-tiny tooltip"></div>
+                                <div id="minor-5" class="stone-border-tiny tooltip"></div>
+                                <div id="minor-6" class="stone-border-tiny tooltip"></div>
+                            </div>
+                        </div>
+                        <div id="minor-skills-values" class="couple-tiny stone-border-tiny">
+                            <div id="minor-1-number-container" class="stone-padding-tiny">
+                                <input type="number" name="minor-1-number" id="minor-1-number" value="0" disabled />
+                            </div>
+                            <div id="minor-2-number-container" class="stone-padding-tiny">
+                                <input type="number" name="minor-2-number" id="minor-2-number" value="0" disabled />
+                            </div>
+                            <div id="minor-3-number-container" class="stone-padding-tiny">
+                                <input type="number" name="minor-3-number" id="minor-3-number" value="0" disabled />
+                            </div>
+                            <div id="minor-4-number-container" class="stone-padding-tiny">
+                                <input type="number" name="minor-4-number" id="minor-4-number" value="0" disabled />
+                            </div>
+                            <div id="minor-5-number-container" class="stone-padding-tiny">
+                                <input type="number" name="minor-5-number" id="minor-5-number" value="0" disabled />
+                            </div>
+                            <div id="minor-6-number-container" class="stone-padding-tiny">
+                                <input type="number" name="minor-6-number" id="minor-6-number" value="0" disabled />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="main-col">
+                <h1>Special A/D</h1>
+                <div id="special-ad" class="couple-container-no-gap">
+                    <div id="special-ad-list" class="couple">
+                        <div class="stone-border">
+                            <h2>MAX HIT POINTS PER LEVEL</h2>
+                            <div id="max-hp-level-container" class="stone-padding">
+                                <input type="number" name="max-hp-level" id="max-hp-level" value=8 disabled>
+                            </div>
+                        </div>
+                        <div class="stone-border">
+                            <h2>ADVANTAGES</h2>
+                            <div id="special-advantages" class="stone-padding-tiny"></div>
+                        </div>
+                        <div class="stone-border">
+                            <h2>DISADVANTAGES</h2>
+                            <div id="special-disadvantages" class="stone-padding-tiny"></div>
+                        </div>
+                    </div>
+                    <div id="special-ad-bar-container" class="couple">
+                        <div class="stone-border-tiny">
+                            <h2>SKILL ADVANCEMENT FOR CLASS</h2>
+                        </div>
+                        <div id="special-ad-bar" class="stone-border-tiny">
+                            <div id="special-ad-label">
+                                <h3 class="special-ad-label-left">DIFFICULT</h3>
+                                <h3>x3.0</h3>
+                                <h3 class="special-ad-label-left">AVERAGE</h3>
+                                <h3>x3.0</h3>
+                                <h3 class="special-ad-label-left">EASY</h3>
+                            </div>
+                            <div id="special-ad-range-container" class="stone-paddingless">
+                                <input id="special-ad-range" orient="vertical" type="range" step="1" value=14 min="-36"
+                                    max="65" disabled />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <div id="bg-blur"></div>
+    <script src="resources/df-data-eng.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>
