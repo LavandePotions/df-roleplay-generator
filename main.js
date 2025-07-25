@@ -295,7 +295,13 @@ function randomClassSpecial(advantagesArray, disadvantagesArray) {
             description: key[1].description
         };
 
-        if (characterObject.class.special.advantages.includes(advantageObject)) {
+        let isDuplicate = false;
+        characterObject.class.special.advantages.forEach(advantage => {
+            if (advantage.text === txt) {
+                isDuplicate = true;
+            }
+        });
+        if (isDuplicate) {
             break;
         }
         characterObject.class.special.advantages.push(advantageObject);
@@ -321,7 +327,13 @@ function randomClassSpecial(advantagesArray, disadvantagesArray) {
             description: key[1].description
         };
 
-        if (characterObject.class.special.disadvantages.includes(disadvantageObject)) {
+        let isDuplicate = false;
+        characterObject.class.special.disadvantages.forEach(disadvantage => {
+            if (disadvantage.text === txt) {
+                isDuplicate = true;
+            }
+        });
+        if (isDuplicate) {
             break;
         }
         characterObject.class.special.disadvantages.push(disadvantageObject);
