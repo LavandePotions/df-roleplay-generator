@@ -39,7 +39,7 @@ body {
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     color: var(--df-yellow);
     font-family: kingthings;
 }
@@ -129,7 +129,7 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 #settings a {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-family: kingthings;
     border-radius: 0;
     color: var(--df-yellow);
@@ -215,6 +215,7 @@ input[type="number"]::-webkit-outer-spin-button {
     border: 0;
     margin: 0;
     padding: 0;
+    opacity: 1;
 }
 
 #character-info select:disabled {
@@ -295,6 +296,7 @@ div.couple-container div div input {
     display: flex;
     flex-flow: column;
     align-items: center;
+    justify-content: center;
 }
 
 div.couple-tiny div input {
@@ -389,10 +391,21 @@ div.couple-tiny div input {
 
 #special-ad-range {
     width: 3rem;
+    writing-mode: bt-lr;
+    /* IE */
+    -webkit-appearance: slider-vertical;
+    /* WebKit */
 }
 
-#special-ad-range::-webkit-range-track,
 #special-ad-range::-moz-range-track {
+    background-color: var(--df-red);
+    width: inherit;
+    opacity: 1;
+    background-image: linear-gradient(0deg, var(--df-dark) 66%, var(--df-red) 35%);
+    background-size: 100% 75%;
+}
+
+#special-ad-range::-webkit-slider-runnable-track {
     background-color: var(--df-red);
     width: inherit;
     opacity: 1;
@@ -402,13 +415,14 @@ div.couple-tiny div input {
 
 /* For Chrome */
 input[type="range"]#special-ad-range::-webkit-slider-thumb {
-    -webkit-appearance: none;
+    -webkit-appearance: none !important;
     height: 1.5rem;
-    width: inherit;
+    width: 120px;
+    height: 60px;
     border: none;
     border-radius: 0;
     /* pris en compte sur Webkit et Edge */
-    background: url("resources/images/Dagger.png");
+    background: url("resources/images/Dagger.png") !important;
     background-size: contain;
     background-repeat: no-repeat;
     /* pris en compte sur Webkit only */
