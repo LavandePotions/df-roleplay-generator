@@ -1,0 +1,12 @@
+node_modules
+npm-debug.log
+.env
+.DS_Store
+.vscode
+.eslintrc.js
+app.js
+eslint.config.mjs
+old-df-data-eng.js
+old-main.js
+package-lock.json
+package.json
